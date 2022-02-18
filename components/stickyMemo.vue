@@ -4,24 +4,32 @@
     class="sticky-memo pa-0"
     :style="{
       left: `${memo.x}px`,
-      top: `${memo.y}px`
+      top: `${memo.y}px`,
+      width: `${memo.width}px`,
+      height: `${memo.height}px`
     }"
-    @mousedown="handleMouseDown2"
-    @mouseup="handleMouseUp"
+
   >
-    <div class="d-flex align-center sticky-memo-header px-2">
-      <v-btn icon color="black" @click="handleClickAddButton">
+    <div
+      class="d-flex align-center sticky-memo-header px-2"
+      @mousedown="handleMouseDown"
+      @mouseup="handleMouseUp"
+    >
+      <v-btn icon color="black" @click="handleClickAddButton" @mousedown.stop >
         <v-icon>mdi-plus</v-icon>
       </v-btn>
       {{ memo.info.title }}
       <v-spacer />
-      <v-btn icon @click="handleClickMinimum">
+      <v-btn icon @click="handleClickClose" @mousedown.stop>
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </div>
-    <div class="sticky-memo-content px-2">
-      <v-textarea v-model="text"></v-textarea>
+    <div class="sticky-memo-content d-flex align-stretch">
+      <div class="left"/>
+      <v-textarea v-model="text" dense class="px-2"></v-textarea>
+      <div class="right"/>
     </div>
+    <div class="bottom" />
   </div>
 </template>
 
@@ -48,7 +56,8 @@ export default class extends Vue {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @Emit("change-text") changeTextEmit(text: string) {}
-
+  @Emit("click-add") clickAddEmit() {}
+  @Emit("click-close") clickClose() {}
   get text() {
     return this.memo.info?.content ?? ""
   }
@@ -57,65 +66,97 @@ export default class extends Vue {
     this.changeTextEmit(str)
   }
 
-  handleMouseDown() {
-    this.$refs.stickyMemo.style.position = 'absolute'
-  }
-
   handleDragStart(e: DragEvent) {
     e.dataTransfer?.setDragImage(new Image(), 0,0)
   }
 
   moveAt(pageX: number, pageY: number) {
+    const newX = pageX - this.shiftX
+    const newY = pageY - this.shiftY - 60 // ヘッダー分を考慮
+    const fixX = newX < 0 ? 0 : newX > 1920 ? 1920 : newX
+    const fixY = newY < 0 ? 0 : newY > 1280 ? 1280 : newY
     this.dragEndEmit({
-      x: pageX - this.shiftX,
-      y: pageY - this.shiftY
+      x: fixX,
+      y: fixY
     })
   }
 
   onMouseMove(event: MouseEvent) {
+    console.log(event)
     this.moveAt(event.pageX, event.pageY)
   }
 
-  handleMouseDown2(e: MouseEvent) {
+  isMouseXInBox() {
+    return  this.shiftX > 2
+      && this.shiftX < this.memo.width -2
+  }
+
+  isMouseYInBox() {
+    return this.shiftY > 2
+    && this.shiftY < this.memo.height - 2
+  }
+
+  handleMouseDown(e: MouseEvent) {
     this.shiftX = e.clientX - this.$refs.stickyMemo.getBoundingClientRect().left
     this.shiftY = e.clientY - this.$refs.stickyMemo.getBoundingClientRect().top
-
-    const nuxt = document.getElementById("vuetify-app")
-    nuxt?.append(this.$refs.stickyMemo)
-    this.moveAt(e.pageX, e.pageY)
-    document.addEventListener('mousemove', this.onMouseMove)
+    if (this.isMouseXInBox() && this.isMouseYInBox()) {
+      const nuxt = document.getElementById("vuetify-app")
+      nuxt?.append(this.$refs.stickyMemo)
+      this.moveAt(e.pageX, e.pageY)
+      document.addEventListener('mousemove', this.onMouseMove)
+      // 画面外で左クリックを離されたときにマウスアップイベントを発火させるために追加
+      window.addEventListener('mouseup', this.handleMouseUp)
+    }
   }
 
   handleMouseUp() {
     document.removeEventListener('mousemove', this.onMouseMove)
     this.$refs.stickyMemo.onmouseup = null
+    // 画面外でのマウスアップイベントを削除
+    window.removeEventListener('mouseup', this.handleMouseUp)
   }
 
   mounted() {
     this.$refs.stickyMemo.ondragstart = () => false
   }
 
-  handleClickMinimum() {
-
+  handleClickClose() {
+    this.clickClose()
   }
 
-  handleClickAddButton() {}
+  handleClickAddButton() {
+    this.clickAddEmit()
+  }
 }
 </script>
 
 <style scoped>
 .sticky-memo-header {
   background-color: yellow;
+  border-radius: 4px 4px 0px 0px;
+
   display: flex;
   width: 100%;
   color: black;
 }
 .sticky-memo {
+  cursor: default;
   position: absolute;
-
+  border-radius: 4px;
   z-index: 2;
   background-color: white;
   color:black;
+  /* border: solid 2px black; */
   box-shadow: 0 7px 8px -4px rgba(0,0,0,.2),0 12px 17px 2px rgba(0,0,0,.14),0 5px 22px 4px rgba(0,0,0,.12)!important;
+}
+.left, .right {
+  width: 2px;
+  background-color: transparent;
+  cursor: ew-resize;
+}
+.bottom {
+  height: 2px;
+  background-color: transparent;
+  cursor: ns-resize;
 }
 </style>

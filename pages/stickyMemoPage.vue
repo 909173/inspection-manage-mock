@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="vuetify-app">
     <stickyMemoArea></stickyMemoArea>
   </div>
 </template>

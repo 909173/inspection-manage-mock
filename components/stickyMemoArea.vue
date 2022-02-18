@@ -1,11 +1,15 @@
 <template>
   <div class="sticky-memo-area">
+    <v-btn @click="handleClickAddButton">add</v-btn>
+    {{ memos }}
     <StickyMemoVue
-      v-for="memo in memos"
-      :key="memo.zIndex"
+      v-for="(memo, i) in memos"
+      :key="i"
       :memo="memo"
       @dragend="handleDragEnd($event, memo)"
       @change-text="handleChangeText($event, memo)"
+      @click-add="handleClickAddButton"
+      @click-close="handleClickClose(memo)"
     ></StickyMemoVue>
   </div>
 </template>
@@ -22,26 +26,24 @@ import StickyMemoVue from "@/components/stickyMemo.vue"
 })
 export default class extends Vue {
   isVisible: boolean = true
-  memos: StickyMemo[] = [{
-    x: 100,
-    y: 100,
-    zIndex: 1,
-    info: {
-      title: "title",
-      content: "some content"
-    }}, {
-    x: 100,
-    y: 100,
-    zIndex: 3,
-    info: {
-      title: "title",
-      content: "some content"
-    }
-  }]
+  memosData: StickyMemo[] = JSON.parse(localStorage.getItem("memo") ?? "[]")
+
+  get memos() {
+    return this.memosData
+  }
+
+  set memos(memos: StickyMemo[]) {
+    localStorage.setItem("memo", JSON.stringify(memos))
+    this.memosData = memos
+  }
+
+  get largestIndex() {
+    return Math.max(...[0,...this.memosData.map(x => x.index)])
+  }
 
   handleDragEnd(e: {x: number, y: number}, memo: StickyMemo) {
     this.memos = this.memos.map(m => {
-      if (m.zIndex === memo.zIndex) {
+      if (m.index === memo.index) {
         return {
           ...m,
           x: e.x,
@@ -54,7 +56,7 @@ export default class extends Vue {
 
   handleChangeText(text: string, memo: StickyMemo) {
     this.memos = this.memos.map(m => {
-      if (m.zIndex === memo.zIndex) {
+      if (m.index === memo.index) {
         return {
           ...m,
           info: {
@@ -65,6 +67,24 @@ export default class extends Vue {
       }
       return m
     })
+  }
+
+  handleClickAddButton() {
+    this.memos.push({
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 200,
+      index: this.largestIndex + 1,
+      info: {
+        title: "",
+        content: ""
+      }
+    })
+  }
+
+  handleClickClose(memo: StickyMemo) {
+    this.memos = this.memos.filter(x => x.index !== memo.index)
   }
 }
 </script>
