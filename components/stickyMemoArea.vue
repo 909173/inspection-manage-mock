@@ -8,9 +8,21 @@
       :memo="memo"
       @dragend="handleDragEnd($event, memo)"
       @change-text="handleChangeText($event, memo)"
-      @click-add="handleClickAddButton"
-      @click-close="handleClickClose(memo)"
-    ></StickyMemoVue>
+    >
+      <template #header>
+        <v-btn icon color="black" @click="handleClickAddButton" @mousedown.stop >
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+        {{ memo.info.title }}
+        <v-spacer />
+        <v-btn icon @click="handleClickClose(memo)" @mousedown.stop>
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </template>
+      <template #default>
+        <v-textarea v-model="memo.info.content" dense class="px-2"></v-textarea>
+      </template>
+    </StickyMemoVue>
   </div>
 </template>
 

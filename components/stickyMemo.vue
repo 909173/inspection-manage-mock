@@ -11,22 +11,17 @@
 
   >
     <div
-      class="d-flex align-center sticky-memo-header px-2"
+      class="sticky-memo-header px-2"
       @mousedown="handleMouseDown"
       @mouseup="handleMouseUp"
     >
-      <v-btn icon color="black" @click="handleClickAddButton" @mousedown.stop >
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-      {{ memo.info.title }}
-      <v-spacer />
-      <v-btn icon @click="handleClickClose" @mousedown.stop>
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
+      <slot name="header"></slot>
+
     </div>
     <div class="sticky-memo-content d-flex align-stretch">
       <div class="left"/>
-      <v-textarea v-model="text" dense class="px-2"></v-textarea>
+      <!-- <v-textarea v-model="text" dense class="px-2"></v-textarea> -->
+      <slot></slot>
       <div class="right"/>
     </div>
     <div class="bottom" />
@@ -37,7 +32,7 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Emit, Prop } from 'vue-property-decorator'
-import { StickyMemo } from '~/types/stickyMemo'
+import { Sticky } from '~/types/stickyMemo'
 @Component
 export default class extends Vue {
   isVisible: boolean = true
@@ -47,23 +42,11 @@ export default class extends Vue {
 
   shiftX = 0
   shiftY = 0
-  @Prop({ required: true }) memo!: StickyMemo
+  @Prop({ required: true }) memo!: Sticky<any>
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @Emit("dragend") dragEndEmit(eve: {x: number, y: number}) {}
   handleDrag(e: DragEvent) {
     this.moveAt(e.pageX, e.pageY)
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @Emit("change-text") changeTextEmit(text: string) {}
-  @Emit("click-add") clickAddEmit() {}
-  @Emit("click-close") clickClose() {}
-  get text() {
-    return this.memo.info?.content ?? ""
-  }
-
-  set text(str: string) {
-    this.changeTextEmit(str)
   }
 
   handleDragStart(e: DragEvent) {
@@ -82,7 +65,6 @@ export default class extends Vue {
   }
 
   onMouseMove(event: MouseEvent) {
-    console.log(event)
     this.moveAt(event.pageX, event.pageY)
   }
 
@@ -119,14 +101,6 @@ export default class extends Vue {
   mounted() {
     this.$refs.stickyMemo.ondragstart = () => false
   }
-
-  handleClickClose() {
-    this.clickClose()
-  }
-
-  handleClickAddButton() {
-    this.clickAddEmit()
-  }
 }
 </script>
 
@@ -134,7 +108,7 @@ export default class extends Vue {
 .sticky-memo-header {
   background-color: yellow;
   border-radius: 4px 4px 0px 0px;
-
+  align-items: center;
   display: flex;
   width: 100%;
   color: black;
