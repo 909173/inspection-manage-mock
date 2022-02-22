@@ -6,7 +6,8 @@
       left: `${memo.x}px`,
       top: `${memo.y}px`,
       width: `${memo.width}px`,
-      height: `${memo.height}px`
+      height: `${memo.height}px`,
+      display: isVisible === false ? 'none' : ''
     }"
 
   >
@@ -20,7 +21,6 @@
     </div>
     <div class="sticky-memo-content d-flex align-stretch">
       <div class="left"/>
-      <!-- <v-textarea v-model="text" dense class="px-2"></v-textarea> -->
       <slot></slot>
       <div class="right"/>
     </div>
@@ -33,9 +33,14 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Emit, Prop } from 'vue-property-decorator'
 import { Sticky } from '~/types/stickyMemo'
-@Component
+@Component({
+  name: "sticky-memo",
+  model: {
+    prop: "isVisible",
+    event: "change"
+  }
+})
 export default class extends Vue {
-  isVisible: boolean = true
   '$refs': {
     stickyMemo: HTMLElement
   }
@@ -43,21 +48,34 @@ export default class extends Vue {
   shiftX = 0
   shiftY = 0
   @Prop({ required: true }) memo!: Sticky<any>
+
+  @Prop({ required: false }) isVisible!: boolean
+
+  @Prop({ required: false, default: "vuetify-app"}) targetId!: string
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @Emit() change(value:boolean) {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @Emit("dragend") dragEndEmit(eve: {x: number, y: number}) {}
-  handleDrag(e: DragEvent) {
-    this.moveAt(e.pageX, e.pageY)
-  }
 
-  handleDragStart(e: DragEvent) {
-    e.dataTransfer?.setDragImage(new Image(), 0,0)
-  }
-
-  moveAt(pageX: number, pageY: number) {
-    const newX = pageX - this.shiftX
-    const newY = pageY - this.shiftY - 60 // ヘッダー分を考慮
-    const fixX = newX < 0 ? 0 : newX > 1920 ? 1920 : newX
-    const fixY = newY < 0 ? 0 : newY > 1280 ? 1280 : newY
+  moveAt(e: MouseEvent) {
+    const target = document.getElementById(this.targetId)
+    const leftPrefix = target?.getBoundingClientRect().left ?? 0;
+    const topPrefix = target?.getBoundingClientRect().top ?? 0;
+    const newX = e.clientX - this.shiftX - (leftPrefix)
+    const newY = e.clientY - this.shiftY - (topPrefix)
+    const rightEdge = (target?.offsetWidth ?? 0) - this.$refs.stickyMemo.offsetWidth
+    const bottomEdge = (target?.offsetHeight ?? 0) - this.$refs.stickyMemo.offsetHeight
+    const fixX = newX < 0
+      ? 0
+      : newX > rightEdge
+      ? rightEdge
+      : newX
+    const fixY = newY < 0
+      ? 0
+      : newY > bottomEdge
+      ? bottomEdge
+      : newY
     this.dragEndEmit({
       x: fixX,
       y: fixY
@@ -65,7 +83,7 @@ export default class extends Vue {
   }
 
   onMouseMove(event: MouseEvent) {
-    this.moveAt(event.pageX, event.pageY)
+    this.moveAt(event)
   }
 
   isMouseXInBox() {
@@ -79,12 +97,13 @@ export default class extends Vue {
   }
 
   handleMouseDown(e: MouseEvent) {
+    const target = document.getElementById(this.targetId)
     this.shiftX = e.clientX - this.$refs.stickyMemo.getBoundingClientRect().left
     this.shiftY = e.clientY - this.$refs.stickyMemo.getBoundingClientRect().top
     if (this.isMouseXInBox() && this.isMouseYInBox()) {
-      const nuxt = document.getElementById("vuetify-app")
-      nuxt?.append(this.$refs.stickyMemo)
-      this.moveAt(e.pageX, e.pageY)
+      target?.append(this.$refs.stickyMemo)
+
+      this.moveAt(e)
       document.addEventListener('mousemove', this.onMouseMove)
       // 画面外で左クリックを離されたときにマウスアップイベントを発火させるために追加
       window.addEventListener('mouseup', this.handleMouseUp)

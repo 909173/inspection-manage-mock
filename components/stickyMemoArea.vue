@@ -1,11 +1,14 @@
 <template>
-  <div class="sticky-memo-area">
+  <div id="dragging-area" class="sticky-memo-area">
     <v-btn @click="handleClickAddButton">add</v-btn>
+    <v-btn @click="handleClickChangeVisible">表示非表示切り替え</v-btn>
     {{ memos }}
     <StickyMemoVue
       v-for="(memo, i) in memos"
       :key="i"
       :memo="memo"
+      :is-visible="memo.isVisible"
+      target-id="dragging-area"
       @dragend="handleDragEnd($event, memo)"
       @change-text="handleChangeText($event, memo)"
     >
@@ -98,12 +101,19 @@ export default class extends Vue {
   handleClickClose(memo: StickyMemo) {
     this.memos = this.memos.filter(x => x.index !== memo.index)
   }
+
+  handleClickChangeVisible() {
+    this.memos = this.memos.map(x => ({
+      ...x,
+      isVisible: !x.isVisible
+    }))
+  }
 }
 </script>
 
 <style scoped>
 .sticky-memo-area {
-  /* position: relative; */
+  position: relative;
   width: 800px;
   height: 800px;
   background: grey;
