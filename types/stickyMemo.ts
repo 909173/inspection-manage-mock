@@ -1,6 +1,6 @@
 export type Sticky<P> = {
-  x: number | string
-  y: number | string
+  x: number
+  y: number
   width: number
   height: number
   index: number

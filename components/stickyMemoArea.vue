@@ -9,8 +9,8 @@
       :memo="memo"
       :is-visible="memo.isVisible"
       target-id="dragging-area"
-      @dragend="handleDragEnd($event, memo)"
-      @change-text="handleChangeText($event, memo)"
+      @drag-end="handleDragEnd($event, memo)"
+      @drag-end-edge="handleDragEndEdge($event, memo)"
     >
       <template #header>
         <v-btn icon color="black" @click="handleClickAddButton" @mousedown.stop >
@@ -63,6 +63,21 @@ export default class extends Vue {
           ...m,
           x: e.x,
           y: e.y
+        }
+      }
+      return m
+    })
+  }
+
+  handleDragEndEdge(e: {x: number, y: number, height: number, width: number}, memo: StickyMemo) {
+    this.memos = this.memos.map(m => {
+      if (m.index === memo.index) {
+        return {
+          ...m,
+          x: e.x,
+          y: e.y,
+          width: e.width,
+          height: e.height
         }
       }
       return m
