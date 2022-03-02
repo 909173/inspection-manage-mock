@@ -23,7 +23,11 @@
         </v-btn>
       </template>
       <template #default>
-        <v-textarea v-model="memo.info.content" dense class="px-2"></v-textarea>
+        <div class="relative-container">
+          <div class="absolute-container">
+            <vue-editor v-model="memo.content" :editor-toolbar="customToolbar" />
+          </div>
+        </div>
       </template>
     </StickyMemoVue>
   </div>
@@ -54,6 +58,12 @@ export default class extends Vue {
 
   get largestIndex() {
     return Math.max(...[0,...this.memosData.map(x => x.index)])
+  }
+
+  get customToolbar() {
+    return [
+      {color:[]}
+    ]
   }
 
   handleDragEnd(e: {x: number, y: number}, memo: StickyMemo) {
@@ -132,5 +142,30 @@ export default class extends Vue {
   width: 800px;
   height: 800px;
   background: grey;
+}
+.relative-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.absolute-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+</style>
+<style>
+.quillWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.quill-container {
+  flex: 1;
+}
+.ql-editor {
+  min-height: 100% !important;
 }
 </style>

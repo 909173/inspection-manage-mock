@@ -91,6 +91,10 @@ export default {
           title: "stickyMemo",
           to: "/stickyMemoPage",
           icon: "mdi-apps"
+        }, {
+          title: "Shecma",
+          to: "/schemaImage",
+          icon: "mdi-apps"
         }
       ],
       miniVariant: false,

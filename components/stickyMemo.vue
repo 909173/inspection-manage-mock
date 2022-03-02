@@ -213,7 +213,6 @@ export default class extends Vue {
   z-index: 2;
   background-color: white;
   color:black;
-  /* border: solid 2px black; */
   box-shadow: 0 7px 8px -4px rgba(0,0,0,.2),0 12px 17px 2px rgba(0,0,0,.14),0 5px 22px 4px rgba(0,0,0,.12)!important;
   display: flex;
   flex-direction: column;
