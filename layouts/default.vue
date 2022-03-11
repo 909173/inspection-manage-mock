@@ -95,6 +95,10 @@ export default {
           title: "Shecma",
           to: "/schemaImage",
           icon: "mdi-apps"
+        }, {
+          title: "Graph",
+          to: "/graph",
+          icon: "mdi-apps"
         }
       ],
       miniVariant: false,

@@ -1,9 +1,17 @@
 <template>
-  <div class="d-flex pa-1">
-    <div ref="container" class="canvas-container" />
-    <div class="pa-1 d-flex flex-grow-1 flex-wrap">
-      <div v-for="i in 10" :key="i">
-        <img :src="`https://picsum.photos/id/${i}/300/200`" alt="" @click="handleClickImage(`https://picsum.photos/id/${i}/300/200`)">
+  <div>
+    <div class="d-flex">
+      <v-radio-group v-model="canvasMode" :column="false">
+        <v-radio label="ドローモード" value="draw"/>
+        <v-radio label="選択モード" value="select"/>
+      </v-radio-group>
+    </div>
+    <div class="d-flex pa-1">
+      <div ref="container" class="canvas-container" />
+      <div class="pa-1 d-flex flex-grow-1 flex-wrap">
+        <div v-for="i in 10" :key="i">
+          <img :src="`https://picsum.photos/id/${i}/300/200`" alt="" @click="handleClickImage(`https://picsum.photos/id/${i}/300/200`)">
+        </div>
       </div>
     </div>
   </div>
@@ -33,7 +41,7 @@ export default class extends Vue {
   mouseDownPosition: Vector2d | null = null
   mousePosition: Vector2d | null = null
   lastLine = {} as Konva.Line
-
+  canvasMode: "draw" | "select" = "draw"
   mounted() {
     this.init()
   }
@@ -61,9 +69,11 @@ export default class extends Vue {
     this.stage.on("mousedown", this.mouseDown)
     this.stage.on("mousemove", this.mouseMove)
     this.stage.on("mouseup", this.mouseUp)
+    this.canvasMode = "draw"
   }
 
   mouseDown() {
+    if (this.canvasMode !== "draw") return
     this.guideLayer.destroyChildren()
     this.guideLayer.draw()
     this.isPaint = true
@@ -89,6 +99,7 @@ export default class extends Vue {
   }
 
   mouseMove() {
+    if (this.canvasMode !== "draw") return
     if (!this.isPaint) return
     this.guideLayer.destroyChildren()
     this.guideLayer.draw()
@@ -106,6 +117,7 @@ export default class extends Vue {
   }
 
   mouseUp() {
+    if (this.canvasMode !== "draw") return
     this.isPaint = false
     this.mousePosition = this.stage.getPointerPosition()
     this.lastLine.transformsEnabled("position")
@@ -138,15 +150,16 @@ export default class extends Vue {
       })
       // shapeTransformer.nodes([schemaImage])
       this.schemaLayer.add(shapeTransformer)
-      // schemaImage.on("click", () => {
-      //   this.schemaLayer.getChildren().forEach((transformer) => {
-      //   if (transformer instanceof Konva.Transformer) {
-      //     transformer.anchorFill("transparent")
-      //   }
-      // })
-      // })
+      schemaImage.on("click", () => {
+        this.schemaLayer.getChildren().forEach((transformer) => {
+        if (transformer instanceof Konva.Transformer) {
+          transformer.anchorFill("transparent")
+        }
+      })
+      })
       // this.stage.add(this.schemaLayer)
       this.schemaLayer.moveToBottom()
+      this.canvasMode = "select"
     }
   }
 }
