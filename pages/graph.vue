@@ -11,9 +11,10 @@
           <v-card-text>
             {{ graphTool }}
           </v-card-text>
-          <ChartJsGraph v-if="graphTool=== 'chart.js'" :graph-data="graphData"></ChartJsGraph>
-          <C3JsGraph v-if="graphTool === 'C3.js'" :graph-data="graphData"></C3JsGraph>
-
+          <ChartJsGraph v-if="graphTool=== graphTools[0]" :graph-data="graphData"></ChartJsGraph>
+          <C3JsGraph v-else-if="graphTool === graphTools[1]" :graph-data="graphData"></C3JsGraph>
+          <GoogleChartGraph v-else-if="graphTool === graphTools[2]"></GoogleChartGraph>
+          <TauChartGraph v-else-if="graphTool === graphTools[3]" :graph-data="graphData"></TauChartGraph>
         </v-card>
       </v-tab-item>
     </v-tabs-items>
@@ -25,7 +26,9 @@ import Vue from "vue";
 import Component from "vue-class-component"
 import ChartJsGraph from "@/components/chartjsGraph.vue"
 import C3JsGraph from "@/components/c3jsGraph.vue"
-const graphTools = ["chart.js", "C3.js", "Google Charts"] as const
+import TauChartGraph from "@/components/tauchartGraph.vue"
+import GoogleChartGraph from "@/components/googleChartGraph.vue"
+const graphTools = ["chart.js", "C3.js", "GoogleCharts", "tauchart"] as const
 export type GraphTools = typeof graphTools[number]
 export type IntraocularPressureTest = {
   testDate: string
@@ -37,7 +40,9 @@ export type IntraocularPressureTest = {
   name: "graph",
   components: {
     ChartJsGraph,
-    C3JsGraph
+    C3JsGraph,
+    TauChartGraph,
+    GoogleChartGraph
   }
 })
 export default class extends Vue {
@@ -45,7 +50,7 @@ export default class extends Vue {
   graphTools = graphTools
   graphData: IntraocularPressureTest[] = [
     {
-      testDate: "2021/9/21",
+      testDate: "2017/9/21",
       left: 8.9,
       right: 11.0
     }, {

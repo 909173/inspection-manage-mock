@@ -5,9 +5,10 @@
         <v-radio label="ドローモード" value="draw"/>
         <v-radio label="選択モード" value="select"/>
       </v-radio-group>
+      <v-btn @click="pasteClip">貼り付け</v-btn>
     </div>
     <div class="d-flex pa-1">
-      <div ref="container" class="canvas-container" />
+      <div ref="container" class="canvas-container" @paste="pasteEvent" />
       <div class="pa-1 d-flex flex-grow-1 flex-wrap">
         <div v-for="i in 10" :key="i">
           <img :src="`https://picsum.photos/id/${i}/300/200`" alt="" @click="handleClickImage(`https://picsum.photos/id/${i}/300/200`)">
@@ -152,15 +153,59 @@ export default class extends Vue {
       this.schemaLayer.add(shapeTransformer)
       schemaImage.on("click", () => {
         this.schemaLayer.getChildren().forEach((transformer) => {
-        if (transformer instanceof Konva.Transformer) {
-          transformer.anchorFill("transparent")
-        }
-      })
+          if (transformer instanceof Konva.Transformer) {
+            transformer.anchorFill("transparent")
+          }
+        })
       })
       // this.stage.add(this.schemaLayer)
       this.schemaLayer.moveToBottom()
       this.canvasMode = "select"
     }
+  }
+
+  pasteClip() {
+    (navigator.clipboard as any).read().then(async (x: any) => { // TODO: 実際はAnyを使わない。
+      const clipData: Blob = await x[0].getType("image/png") // as blob
+      const url = URL.createObjectURL(clipData)
+      const image = new Image()
+      image.src = url
+      const schemaImage = new Konva.Image({
+        image,
+        x: 0,
+        y: 0,
+        width: 300,
+        heigh: 200,
+        draggable: true
+      })
+      this.schemaLayer.add(schemaImage)
+      const shapeTransformer = new Konva.Transformer({
+        enabledAnchors: ["top-left", "top-right", "bottom-left", "bottom-right"],
+        boundBoxFunc: (_, newBox) => {
+          newBox.width = Math.max(30, newBox.width)
+          return newBox
+        },
+        visible: true,
+        anchorSize: 28,
+        nodes: [schemaImage]
+      })
+      // shapeTransformer.nodes([schemaImage])
+      this.schemaLayer.add(shapeTransformer)
+      schemaImage.on("click", () => {
+        this.schemaLayer.getChildren().forEach((transformer) => {
+          if (transformer instanceof Konva.Transformer) {
+            transformer.anchorFill("transparent")
+          }
+        })
+      })
+      // this.stage.add(this.schemaLayer)
+      this.schemaLayer.moveToBottom()
+      this.canvasMode = "select"
+    })
+  }
+
+  pasteEvent(eve: ClipboardEvent) {
+    console.log(eve)
   }
 }
 </script>

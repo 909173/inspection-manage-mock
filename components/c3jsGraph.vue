@@ -18,6 +18,7 @@
       <v-radio label="1年" :value="1"></v-radio>
       <v-radio label="半年" :value="0.5"></v-radio>
     </v-radio-group>
+    <v-btn @click="handleClickPrint">印刷</v-btn>
   </div>
 </template>
 
@@ -114,6 +115,10 @@ export default class extends Vue{
         }
       }
     })
+  }
+
+  async handleClickPrint() {
+    await (this as any).$htmlToPaper("c3-graph")
   }
 }
 </script>

@@ -22,12 +22,14 @@ export default {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
-    "c3/c3.min.css"
+    "c3/c3.min.css",
+    "taucharts/dist/taucharts.min.css"
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    { src: "@/plugins/vue2Editor.js", mode: "client" }
+    { src: "@/plugins/vue2Editor.js", mode: "client" },
+    { src: "@/plugins/vueHtml.ts", mode: "client"}
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -63,7 +65,7 @@ export default {
     },
   },
   server: {
-    port: 3003
+    port: 6001
   },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
