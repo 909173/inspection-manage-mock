@@ -23,7 +23,7 @@ export default class extends VuexModule {
 
   @Mutation
   CHANGE_STATUS(data: { id: number; status: Status }) {
-    this.tasks.map((x) =>
+    this.tasks = this.tasks.map((x) =>
       x.id === data.id ? { ...x, status: data.status } : x
     )
   }

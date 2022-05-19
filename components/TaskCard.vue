@@ -1,14 +1,14 @@
 <template>
-  <v-card>
+  <v-card class="task-card">
     <v-card-title>
-      {{task.title}}
+      {{taskProp.title}}
     </v-card-title>
     <v-card-text>
-      {{task.comment}}
+      {{taskProp.comment}}
     </v-card-text>
-    <v-chip-group>
+    <v-chip-group v-model="cardStatus" active-class="primary" @change="handleChangeChip">
         <v-chip
-            v-for="source in statusSources" :key="source" @click="handleClickChip(source)"
+            v-for="source in statusSources" :key="source" :value="source"
           >
             {{ source }}
           </v-chip>
@@ -20,17 +20,23 @@
 import Vue from "vue"
 import Component from "vue-class-component"
 import { Prop } from "vue-property-decorator"
+import { taskStore } from "~/store"
 import { Status, Task } from "~/types/task"
-import { taskStore } from "@/store"
 
 @Component({ name: "taskCard"})
 export default class extends Vue {
-  @Prop({ default: true }) task!: Task
+  @Prop({ default: true }) taskProp!: Task
   statusSources: Status[] = ["waiting", "progress", "completed"]
 
-  handleClickChip(data: Status) {
-    taskStore.changeStatus({id: this.task.id, status: data})
+  cardStatus: Status = this.taskProp.status
+
+  handleChangeChip() {
+    taskStore.changeStatus({id: this.taskProp.id, status: this.cardStatus})
   }
 }
 </script>
 
+<style lang="stylus" scoped>
+.chip-active-class
+  color blue
+</style>
