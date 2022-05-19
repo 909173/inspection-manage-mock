@@ -1,8 +1,8 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
-import { Task, Status } from '~/types/task'
+import { Task, Status } from '../types/task'
 
 @Module({
-  name: 'taskModule',
+  name: 'task',
   stateFactory: true,
   namespaced: true,
 })
