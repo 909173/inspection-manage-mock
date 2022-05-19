@@ -4,17 +4,25 @@
     <v-btn class="pl-3" @click="handleClickTaskPage">
       タスク管理
     </v-btn>
+    <v-btn @click="handleClickAddTask">
+      タスク追加
+    </v-btn>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue"
 import Component from "vue-class-component"
+import { taskAddDialogStore } from "~/store"
 
 @Component({name: "mainHeader"})
 export default class extends Vue {
   handleClickTaskPage() {
     this.$router.push("/taskpage")
+  }
+
+  handleClickAddTask() {
+    taskAddDialogStore.openDialog()
   }
 }
 </script>
