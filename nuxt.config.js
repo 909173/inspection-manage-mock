@@ -6,8 +6,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - inspection-manage-mock',
-    title: 'inspection-manage-mock',
+    title: 'storybook-test',
     htmlAttrs: {
       lang: 'en',
     },
@@ -21,7 +20,7 @@ export default {
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [],
+  css: ["@/assets/stylus/main.styl"],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
