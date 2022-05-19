@@ -1,3 +1,3 @@
-import Vue from "vue"
-import confirmMixin from "@/util/confirm"
+import Vue from 'vue'
+import confirmMixin from '~/utils/confirm'
 Vue.use(confirmMixin)
