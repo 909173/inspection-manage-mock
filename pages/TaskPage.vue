@@ -1,34 +1,33 @@
 <template>
-  <v-row
-    align="center"
-    justify="space-around"
-  >
-    <v-btn depressed>
-      Normal
-    </v-btn>
-    <v-btn
-      depressed
-      color="primary"
-    >
-      Primary
-    </v-btn>
-    <v-btn
-      depressed
-      color="error"
-    >
-      Error
-    </v-btn>
-    <v-btn
-      depressed
-      disabled
-    >
-      Disabled
-    </v-btn>
-  </v-row>
+  <div class="task-container d-flex">
+    <div class="flex-grow-1">
+      <div class="waiting-container">
+        waiting
+      </div>
+    </div>
+    <v-divider vertical />
+      <div class="flex-grow-1">
+        <div class="progress-container">
+          progress
+        </div>
+      </div>
+    <v-divider vertical />
+    <div class="flex-grow-1">
+      <div class="complete-container">
+        complete
+      </div>
+    </div>
+  </div>
 </template>
 
-<script>
-export default {
-  name: 'ButtonPage',
-}
+<script lang="ts">
 </script>
+
+<style lang="stylus" scoped>
+.waiting-container
+  height 100%
+.progress-container
+  height 100%
+.complete-container
+  height 100%
+</style>

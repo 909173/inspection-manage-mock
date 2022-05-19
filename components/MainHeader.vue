@@ -1,6 +1,9 @@
 <template>
   <div class="main-header d-flex align-center">
     <div class="header-label pl-2">タスク管理アプリ</div>
+    <v-btn class="pl-3" @click="handleClickTaskPage">
+      タスク管理
+    </v-btn>
   </div>
 </template>
 
@@ -10,7 +13,9 @@ import Component from "vue-class-component"
 
 @Component({name: "mainHeader"})
 export default class extends Vue {
-
+  handleClickTaskPage() {
+    this.$router.push("/taskpage")
+  }
 }
 </script>
 
